@@ -1,8 +1,6 @@
-# Documentation: https://i3wm.org/docs/userguide.html
+# i3 Documentation: https://i3wm.org/docs/userguide.html
 # Config created by Keyitdev https://www.github.com/keyitdev/dotfiles
-# Copyright (C) 2022 Keyitdev
-# free chars: j, k, l
-
+# Heavily modified by synth https://www.github.com/c-um/dotfiles
 
 # set mod
 set $mod Mod1
@@ -10,7 +8,7 @@ set $mod Mod1
 # set font
 font pango:Open sans 11
 
-### Running apps in background ###
+### App Auto-start ###
 
 # set resolution to 1368x768
 exec_always --no-startup-id xrandr --output VGA-0 --mode 1368x768
@@ -18,11 +16,8 @@ exec_always --no-startup-id xrandr --output VGA-0 --mode 1368x768
 # set audio output to headphones
 exec_always --no-startup-id pactl set-sink-port 0 analog-output-headphones
 
-# get new wallpaper
-exec_always --no-startup-id ~/bin/unsplash.sh
-
-# run compton #do not run alongside picom else errors WILL happen
-#exec_always --no-startup-id compton &
+# set wallpaper
+exec_always --no-startup-id ~/bin/wallpaper.sh
 
 # run discord
 exec_always --no-startup-id discord &
@@ -30,44 +25,33 @@ exec_always --no-startup-id discord &
 # run flameshot
 exec_always --no-startup-id flameshot &
 
-# run picom
+# run picom compositor
 exec_always --no-startup-id picom &
 
 # render wallpaper for lockscreen
 exec_always betterlockscreen -u ~/Pictures/wallpapers/lockscreen.png --display 1 --span &
 
-# run mpd
-exec_always --no-startup-id mpd &
-
 # run dunst
 exec_always --no-startup-id dunst &
-
-# run cmus-discord-rpc
-exec_always --no-startup-id cmus-discord-rpc &
-
-# set wallpaper with fed
-exec_always feh --bg-scale $HOME/Pictures/wallpapers/current_blue.png
 
 # launch polybar
 exec_always --no-startup-id killall -q
 exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 
-# start i3 components
-exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
-exec --no-startup-id nm-applet
-
 ### Shortcuts ###
 
 floating_modifier $mod
 
-# start cmus (music player)
+# start cmus
 bindsym $mod+C exec kitty -e cmus
-bindsym $mod+ctrl+C exec kitty -e cmus-discord-rpc
 
-# download yt video as m4a (inside ~/Music/)
+# start spotify w/ adblock
+bindsym $mod+ctrl+C exec /home/synth/spotify.sh
+
+# download yt video as m4a
 bindsym $mod+B exec /home/synth/Music/dl.sh
 
-# start synspades
+# start openspades
 bindsym $mod+R exec /home/synth/os.sh
 
 # start waterfox
@@ -85,12 +69,6 @@ bindsym $mod+Down focus down
 bindsym $mod+Up focus up
 bindsym $mod+Right focus right
 
-# alternatively, you can use the cursor keys:
-bindsym $mod+Shift+Left move left
-bindsym $mod+Shift+Down move down
-bindsym $mod+Shift+Up move up
-bindsym $mod+Shift+Right move right
-
 # split in horizontal orientation
 bindsym $mod+h split h
 
@@ -100,53 +78,30 @@ bindsym $mod+v split v
 # enter fullscreen mode for the focused container
 bindsym $mod+f fullscreen toggle
 
-# change container layout (stacked, tabbed, toggle split)
-#bindsym $mod+q layout stacking
+# change container layout (tabbed, toggle split)
 bindsym $mod+w layout tabbed
 bindsym $mod+e layout toggle split
 
 # toggle tiling / floating
 bindsym $mod+Shift+space floating toggle
 
-# change focus between tiling / floating windows
-bindsym $mod+space focus mode_toggle
-
-# run lockscreen
+# lock computer
 bindsym $mod+Shift+X exec betterlockscreen -l
 
-# toggle polybar
+# restart polybar
 bindsym $mod+o exec $HOME/.config/polybar/launch.sh
-bindsym $mod+p exec killall -q polybar
-
-# focus the parent container
-#bindsym $mod+a focus parent
-
-# focus the child container
-#bindsym $mod+d focus child
-
-# run rofi programs
-#bindsym $mod+a exec "rofi -show drun -no-default-config -config ~/.config/rofi/sidebar.rasi"
-#bindsym $mod+d exec "rofi -show drun -no-default-config -config ~/.config/rofi/center.rasi"
-#bindsym $mod+s exec "rofi -show drun -no-default-config -config ~/.config/rofi/compact.rasi"
-#bindsym $mod+z exec "rofi -show  -modi ':rofi-bookmarks' -no-default-config -config ~/.config/rofi/compact.rasi"
-#bindsym $mod+x exec "theme"
 
 # take a screenshot
 bindsym Shift+Print exec flameshot gui -c
+bindsym Print exec flameshot gui -c
 
-# audio control
+# audio / spotify control
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ +5%
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume @DEFAULT_SINK@ -5%&
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle && mute &
-#bindsym XF86AudioMicMute exec --no-startup-id amixer -D pulse sset Master 5%+ && volume.sh &
-
-# :)
-bindsym ctrl + F1 exec --no-startup-id alacritty
-bindsym ctrl + F2 exec --no-startup-id waterfox
-
-# toggle microphone 
-#bindsym ctrl + F3 exec amixer set Capture cap && dunstify -a "Microphone" "Microphone" "Microphone is now unmuted" -r 100 -i /usr/local/bin/icons/mic.svg
-#bindsym ctrl + F4 exec amixer set Capture nocap && dunstify -a "Microphone" "Microphone" "Microphone is now muted" -r 100 -i /usr/local/bin/icons/mic-off.svg
+bindsym XF86AudioNext exec --no-startup-id playerctl --player=spotify next
+bindsym XF86AudioPrev exec --no-startup-id playerctl --player=spotify previous
+bindsym XF86AudioPause exec --no-startup-id playerctl --player=spotify play-pause
+bindsym XF86AudioPlay exec --no-startup-id playerctl --player=spotify play-pause
 
 # workspaces names
 set $ws1 "1"
@@ -191,33 +146,6 @@ bindsym $mod+Shift+r restart
 # exit i3 (logs you out of your X session)
 bindsym $mod+Shift+e exec "i3-nagbar -t warning -m 'You pressed the exit shortcut. Do you really want to exit i3? This will end your X session.' -B 'Yes, exit i3' 'i3-msg exit'"
 
-# resize window (you can also use the mouse for that)
-#mode "resize" {
-#        # These bindings trigger as soon as you enter the resize mode
-#
-#        # Pressing left will shrink the window’s width.
-#        # Pressing right will grow the window’s width.
-#        # Pressing up will shrink the window’s height.
-#        # Pressing down will grow the window’s height.
-#        bindsym j resize shrink width 10 px or 10 ppt
-#        bindsym k resize grow height 10 px or 10 ppt
-#        bindsym l resize shrink height 10 px or 10 ppt
-#        bindsym semicolon resize grow width 10 px or 10 ppt
-#
-#        # same bindings, but for the arrow keys
-#        bindsym Left resize shrink width 10 px or 10 ppt
-#        bindsym Down resize grow height 10 px or 10 ppt
-#        bindsym Up resize shrink height 10 px or 10 ppt
-#        bindsym Right resize grow width 10 px or 10 ppt
-#
-#        # back to normal: Enter or Escape or $mod+r
-#        bindsym Return mode "default"
-#        bindsym Escape mode "default"
-#        bindsym $mod+r mode "default"
-#}
-
-#bindsym $mod+r mode "resize"
-
 ### BORDERS ###
 
 #border width
@@ -240,47 +168,3 @@ bar {
 # Set inner/outer gaps
 gaps inner 8
 gaps outer 0
-
-# Smart gaps (gaps used if only more than one container on the workspace)
-# smart_gaps on
-
-# Smart borders (draw borders around container only if it is not the only container on this workspace)
-# on|no_gaps (on=always activate and no_gaps=only activate if the gap size to the edge of the screen is 0)
-#smart_borders on
-
-# Press $mod+g to enter the gap mode. Choose o or i for modifying outer/inner gaps. Press one of + / - (in-/decrement for current workspace) or 0 (remove gaps for current workspace). If you also press Shift with these keys, the change will be global for all workspaces.
-set $mode_gaps Gaps: (o) outer, (i) inner
-set $mode_gaps_outer Outer Gaps: +|-|0 (local), Shift + +|-|0 (global)
-set $mode_gaps_inner Inner Gaps: +|-|0 (local), Shift + +|-|0 (global)
-bindsym $mod+g mode "$mode_gaps"
-
-mode "$mode_gaps" {
-        bindsym o      mode "$mode_gaps_outer"
-        bindsym i      mode "$mode_gaps_inner"
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
-mode "$mode_gaps_inner" {
-        bindsym plus  gaps inner current plus 5
-        bindsym minus gaps inner current minus 5
-        bindsym 0     gaps inner current set 0
-
-        bindsym Shift+plus  gaps inner all plus 5
-        bindsym Shift+minus gaps inner all minus 5
-        bindsym Shift+0     gaps inner all set 0
-
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
-mode "$mode_gaps_outer" {
-        bindsym plus  gaps outer current plus 5
-        bindsym minus gaps outer current minus 5
-        bindsym 0     gaps outer current set 0
-
-        bindsym Shift+plus  gaps outer all plus 5
-        bindsym Shift+minus gaps outer all minus 5
-        bindsym Shift+0     gaps outer all set 0
-
-        bindsym Return mode "default"
-        bindsym Escape mode "default"
-}
