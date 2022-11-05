@@ -17,7 +17,7 @@ exec_always --no-startup-id xrandr --output VGA-0 --mode 1368x768
 exec_always --no-startup-id pactl set-sink-port 0 analog-output-headphones
 
 # set wallpaper
-exec_always --no-startup-id ~/bin/wallpaper.sh
+exec_always --no-startup-id ~/bin/unsplash.sh
 
 # run discord
 exec_always --no-startup-id discord &
